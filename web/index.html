@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ABC Bank — Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --coral:   #D85A30;
+    --coral-lt:#FAECE7;
+    --coral-dk:#993C1D;
+    --teal:    #1D9E75;
+    --teal-lt: #E1F5EE;
+    --teal-dk: #0F6E56;
+    --amber:   #BA7517;
+    --amber-lt:#FAEEDA;
+    --blue:    #185FA5;
+    --blue-lt: #E6F1FB;
+    --red:     #E24B4A;
+    --red-lt:  #FCEBEB;
+    --green:   #639922;
+    --green-lt:#EAF3DE;
+    --bg:      #F7F5F2;
+    --surface: #FFFFFF;
+    --border:  rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --text:    #1A1A1A;
+    --text2:   #5A5A5A;
+    --text3:   #9A9A9A;
+    --radius:  12px;
+    --shadow:  0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── Top nav ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-icon {
+    width: 36px; height: 36px; background: var(--coral);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 16px; letter-spacing: -1px;
+  }
+  .brand-name { font-weight: 700; font-size: 16px; color: var(--text); }
+  .brand-sub  { font-size: 11px; color: var(--text3); margin-top: -2px; }
+  nav .spacer { flex: 1; }
+  .nav-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text2);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  /* ── Layout ── */
+  .app { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+
+  /* ── Sidebar ── */
+  aside {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+  }
+  .nav-section { font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--text3); padding: 0 1.25rem; margin: 1rem 0 0.4rem; text-transform: uppercase; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.55rem 1.25rem; cursor: pointer;
+    color: var(--text2); font-size: 13.5px; font-weight: 500;
+    border-left: 3px solid transparent; transition: all 0.15s;
+  }
+  .nav-item:hover  { background: var(--bg); color: var(--text); }
+  .nav-item.active { background: var(--coral-lt); color: var(--coral-dk);
+    border-left-color: var(--coral); }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── Main content ── */
+  main { padding: 2rem; overflow-y: auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 1.5rem; }
+
+  /* ── Stat cards ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.25rem 1.5rem;
+  }
+  .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; margin-bottom: 0.4rem; }
+  .stat-value { font-size: 26px; font-weight: 700; line-height: 1; }
+  .stat-sub   { font-size: 11px; color: var(--text3); margin-top: 0.3rem; }
+  .c-coral  { color: var(--coral); }
+  .c-teal   { color: var(--teal); }
+  .c-amber  { color: var(--amber); }
+  .c-blue   { color: var(--blue); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .card-title { font-weight: 600; font-size: 15px; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 8px; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 0 1rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .badge {
+    display: inline-flex; align-items: center; padding: 2px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .badge-savings { background: var(--teal-lt); color: var(--teal-dk); }
+  .badge-current { background: var(--blue-lt); color: var(--blue); }
+  .badge-deposit  { background: var(--green-lt); color: var(--green); }
+  .badge-withdrawal,.badge-transfer_out { background: var(--red-lt); color: var(--red); }
+  .badge-transfer_in { background: var(--teal-lt); color: var(--teal-dk); }
+  .badge-interest { background: var(--amber-lt); color: var(--amber); }
+
+  /* ── Forms ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+  label { font-size: 12px; font-weight: 500; color: var(--text2); }
+  input, select {
+    height: 38px; border-radius: 8px; border: 1px solid var(--border2);
+    padding: 0 12px; font-family: inherit; font-size: 13.5px; color: var(--text);
+    background: var(--surface); outline: none; transition: border 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(216,90,48,0.1); }
+  select { cursor: pointer; }
+
+  /* ── Buttons ── */
+  .btn {
+    height: 38px; padding: 0 1.25rem; border-radius: 8px; border: none;
+    font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--coral); color: white; }
+  .btn-primary:hover { background: var(--coral-dk); }
+  .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border2); }
+  .btn-secondary:hover { background: #EEE; }
+  .btn-teal { background: var(--teal); color: white; }
+  .btn-teal:hover { background: var(--teal-dk); }
+  .btn-sm { height: 30px; padding: 0 0.75rem; font-size: 12px; }
+  .btn-row { display: flex; gap: 10px; margin-top: 1.25rem; }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--text); color: white;
+    padding: 0.75rem 1.25rem; border-radius: 10px;
+    font-size: 13.5px; font-weight: 500;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    z-index: 9999; max-width: 360px; display: flex; align-items: center; gap: 8px;
+  }
+  #toast.show { opacity: 1; }
+  #toast.error { background: var(--red); }
+  #toast.success { background: var(--teal-dk); }
+
+  /* ── Account detail modal-like panel ── */
+  .detail-panel {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem;
+    display: none;
+  }
+  .detail-panel.open { display: block; }
+  .detail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+    background: var(--coral-lt); color: var(--coral-dk);
+  }
+  .detail-name { font-size: 18px; font-weight: 700; }
+  .detail-acc  { font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .detail-metric { background: var(--bg); border-radius: 10px; padding: 1rem 1.25rem; }
+  .detail-metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .detail-metric-value { font-size: 20px; font-weight: 700; }
+
+  /* ── Empty state ── */
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); }
+  .empty svg { opacity: 0.3; margin-bottom: 1rem; }
+  .empty p { font-size: 15px; font-weight: 500; color: var(--text2); }
+  .empty span { font-size: 13px; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .tab {
+    padding: 0.6rem 1.25rem; cursor: pointer; font-size: 13.5px; font-weight: 500;
+    color: var(--text2); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .tab:hover  { color: var(--text); }
+  .tab.active { color: var(--coral); border-bottom-color: var(--coral); }
+
+  /* ── Txn amount ── */
+  .amt-pos { color: var(--teal); font-weight: 600; }
+  .amt-neg { color: var(--red);  font-weight: 600; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .form-grid.three { grid-template-columns: 1fr 1fr; }
+    .detail-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .app { grid-template-columns: 1fr; }
+    aside { display: none; }
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-icon">AB</div>
+    <div>
+      <div class="brand-name">ABC Bank</div>
+      <div class="brand-sub">Management System</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="nav-status">
+    <div class="dot"></div>
+    <span>Connected to localhost:8080</span>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      Dashboard
+    </div>
+
+    <div class="nav-section">Accounts</div>
+    <div class="nav-item" onclick="showPage('accounts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      All Accounts
+    </div>
+    <div class="nav-item" onclick="showPage('create')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      New Account
+    </div>
+
+    <div class="nav-section">Transactions</div>
+    <div class="nav-item" onclick="showPage('transact')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+      Deposit / Withdraw
+    </div>
+    <div class="nav-item" onclick="showPage('transfer')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Fund Transfer
+    </div>
+    <div class="nav-item" onclick="showPage('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      Transaction History
+    </div>
+
+    <div class="nav-section">Tools</div>
+    <div class="nav-item" onclick="showPage('interest')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      Apply Interest
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main>
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title">Dashboard</div>
+      <div class="stats" id="stat-cards">
+        <div class="stat-card"><div class="stat-label">Total Accounts</div><div class="stat-value c-coral" id="s-total">—</div><div class="stat-sub">across all types</div></div>
+        <div class="stat-card"><div class="stat-label">Total Funds Held</div><div class="stat-value c-teal" id="s-funds">—</div><div class="stat-sub">all balances combined</div></div>
+        <div class="stat-card"><div class="stat-label">Savings Accounts</div><div class="stat-value c-amber" id="s-savings">—</div><div class="stat-sub">4% interest p.a.</div></div>
+        <div class="stat-card"><div class="stat-label">Current Accounts</div><div class="stat-value c-blue" id="s-current">—</div><div class="stat-sub">with overdraft facility</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Recent Accounts
+          <div style="margin-left:auto"><button class="btn btn-secondary btn-sm" onclick="showPage('create')">+ New Account</button></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Account No.</th><th>Holder</th><th>Type</th><th>Balance</th><th></th>
+            </tr></thead>
+            <tbody id="dash-accounts"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Accounts -->
+    <div id="page-accounts" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+        <div class="page-title" style="margin:0">All Accounts</div>
+        <button class="btn btn-primary" onclick="showPage('create')">+ New Account</button>
+      </div>
+
+      <div id="account-detail" class="detail-panel">
+        <div class="detail-header">
+          <div class="avatar" id="d-avatar">—</div>
+          <div>
+            <div class="detail-name" id="d-name">—</div>
+            <div class="detail-acc"  id="d-accno">—</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="closeDetail()">✕ Close</button>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-metric"><div class="detail-metric-label">Balance</div><div class="detail-metric-value c-teal" id="d-bal">—</div></div>
+          <div class="detail-metric"><div class="detail-metric-label">Account Type</div><div class="detail-metric-value" id="d-type">—</div></div>
+          <div class="detail-metric"><div class="detail-metric-label">Transactions</div><div class="detail-metric-value c-coral" id="d-txncount">—</div></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" onclick="prefillDeposit()">Deposit</button>
+          <button class="btn btn-secondary btn-sm" onclick="prefillWithdraw()">Withdraw</button>
+          <button class="btn btn-teal btn-sm" onclick="showHistory()">View History</button>
+          <button class="btn btn-secondary btn-sm" onclick="showPage('interest');document.getElementById('i-accnum').value=currentAccountId">Apply Interest</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Account No.</th><th>Holder</th><th>Type</th><th>Balance</th><th>Transactions</th><th></th>
+            </tr></thead>
+            <tbody id="all-accounts"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Account -->
+    <div id="page-create" class="page">
+      <div class="page-title">New Account</div>
+      <div class="card">
+        <div class="tabs">
+          <div class="tab active" onclick="switchCreateTab('savings', this)">Savings Account</div>
+          <div class="tab" onclick="switchCreateTab('current', this)">Current Account</div>
+        </div>
+
+        <div id="form-savings">
+          <div class="form-grid">
+            <div class="field"><label>Full Name</label><input type="text" id="s-name" placeholder="e.g. Priya Sharma" /></div>
+            <div class="field"><label>Opening Balance (min ₹1,000)</label><input type="number" id="s-balance" placeholder="5000" min="1000" /></div>
+          </div>
+          <div style="margin-top:1rem;padding:0.75rem 1rem;background:var(--teal-lt);border-radius:8px;font-size:12.5px;color:#085041">
+            ✦ Minimum balance: ₹1,000 · Interest rate: 4% p.a. · Applied monthly
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="createSavings()">Create Savings Account</button>
+          </div>
+        </div>
+
+        <div id="form-current" style="display:none">
+          <div class="form-grid three">
+            <div class="field"><label>Full Name</label><input type="text" id="c-name" placeholder="e.g. Arjun Mehta" /></div>
+            <div class="field"><label>Opening Balance</label><input type="number" id="c-balance" placeholder="10000" min="0" /></div>
+            <div class="field"><label>Overdraft Limit</label><input type="number" id="c-overdraft" placeholder="5000" min="0" /></div>
+          </div>
+          <div style="margin-top:1rem;padding:0.75rem 1rem;background:var(--blue-lt);border-radius:8px;font-size:12.5px;color:#042C53">
+            ✦ No minimum balance · Overdraft facility available · No interest
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="createCurrent()">Create Current Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deposit / Withdraw -->
+    <div id="page-transact" class="page">
+      <div class="page-title">Deposit &amp; Withdraw</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+        <div class="card">
+          <div class="card-title" style="color:var(--teal)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16M4 12l8-8 8 8"/></svg>
+            Deposit
+          </div>
+          <div class="field" style="margin-bottom:1rem"><label>Account Number</label><input type="text" id="dep-acc" placeholder="ABC1000" /></div>
+          <div class="field"><label>Amount (₹)</label><input type="number" id="dep-amt" placeholder="500" min="1" /></div>
+          <div class="btn-row"><button class="btn btn-teal" onclick="doDeposit()">Deposit Funds</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="color:var(--red)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V4M4 12l8 8 8-8"/></svg>
+            Withdraw
+          </div>
+          <div class="field" style="margin-bottom:1rem"><label>Account Number</label><input type="text" id="wdw-acc" placeholder="ABC1000" /></div>
+          <div class="field"><label>Amount (₹)</label><input type="number" id="wdw-amt" placeholder="500" min="1" /></div>
+          <div class="btn-row"><button class="btn btn-primary" onclick="doWithdraw()">Withdraw Funds</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fund Transfer -->
+    <div id="page-transfer" class="page">
+      <div class="page-title">Fund Transfer</div>
+      <div class="card" style="max-width:520px">
+        <div class="field" style="margin-bottom:1rem"><label>From Account</label><input type="text" id="t-from" placeholder="ABC1000" /></div>
+        <div class="field" style="margin-bottom:1rem"><label>To Account</label><input type="text" id="t-to" placeholder="ABC1001" /></div>
+        <div class="field"><label>Amount (₹)</label><input type="number" id="t-amt" placeholder="2000" min="1" /></div>
+        <div class="btn-row"><button class="btn btn-primary" onclick="doTransfer()">Transfer Funds</button></div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div id="page-history" class="page">
+      <div class="page-title">Transaction History</div>
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:1.5rem">
+          <input type="text" id="h-accnum" placeholder="Enter account number..." style="max-width:220px" />
+          <button class="btn btn-primary" onclick="loadHistory()">Load History</button>
+        </div>
+        <div id="history-holder">
+          <div class="empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <p>No account selected</p>
+            <span>Enter an account number above to view its transaction history</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interest -->
+    <div id="page-interest" class="page">
+      <div class="page-title">Apply Monthly Interest</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+          <div class="card-title">Single Account</div>
+          <div class="field" style="margin-bottom:1rem"><label>Account Number</label><input type="text" id="i-accnum" placeholder="ABC1000" /></div>
+          <div style="padding:0.75rem 1rem;background:var(--amber-lt);border-radius:8px;font-size:12.5px;color:#412402;margin-bottom:1.25rem">
+            Interest is applied only to Savings accounts (4% p.a. / 12 months).
+          </div>
+          <button class="btn btn-primary" onclick="applyInterestOne()">Apply Interest</button>
+        </div>
+        <div class="card">
+          <div class="card-title">All Eligible Accounts</div>
+          <p style="font-size:13.5px;color:var(--text2);margin-bottom:1.25rem;line-height:1.7">
+            Apply monthly interest to all Savings accounts at once. This simulates end-of-month interest crediting.
+          </p>
+          <button class="btn btn-teal" onclick="applyInterestAll()">Apply to All Savings Accounts</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:8080/api';
+let currentAccountId = null;
+let allAccountsData  = [];
+
+// ── Navigation ────────────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'"))
+      n.classList.add('active');
+  });
+  if (id === 'dashboard') loadDashboard();
+  if (id === 'accounts')  loadAllAccounts();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type === 'success' ? '✓ ' : '✗ ') + msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── API helpers ───────────────────────────────────────────────────
+async function get(path) {
+  const r = await fetch(API + path);
+  return r.json();
+}
+async function post(path, body) {
+  const r = await fetch(API + path, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+async function put(path, body) {
+  const r = await fetch(API + path, {
+    method: 'PUT', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+// ── Format helpers ────────────────────────────────────────────────
+const fmt = n => '₹' + parseFloat(n).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const initials = name => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+function typeBadge(type) {
+  return `<span class="badge badge-${type.toLowerCase()}">${type}</span>`;
+}
+function txnBadge(type) {
+  const label = type.replace('_', ' ');
+  return `<span class="badge badge-${type.toLowerCase()}">${label}</span>`;
+}
+function amtCell(type, amount) {
+  const pos = ['DEPOSIT','TRANSFER_IN','INTEREST'].includes(type);
+  return `<span class="${pos ? 'amt-pos' : 'amt-neg'}">${pos ? '+' : '−'}${fmt(amount)}</span>`;
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const [summary, accounts] = await Promise.all([get('/summary'), get('/accounts')]);
+    allAccountsData = accounts;
+    document.getElementById('s-total').textContent   = summary.totalAccounts;
+    document.getElementById('s-funds').textContent   = fmt(summary.totalFunds);
+    document.getElementById('s-savings').textContent = summary.savingsAccounts;
+    document.getElementById('s-current').textContent = summary.currentAccounts;
+
+    const tbody = document.getElementById('dash-accounts');
+    if (!accounts.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:1.5rem">
+        <p>No accounts yet</p><span>Create your first account to get started</span></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = accounts.slice(-8).reverse().map(a => `
+      <tr>
+        <td class="mono">${a.accountNumber}</td>
+        <td><strong>${a.accountHolderName}</strong></td>
+        <td>${typeBadge(a.accountType)}</td>
+        <td><strong>${fmt(a.balance)}</strong></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="showPage('accounts');openDetail('${a.accountNumber}')">View</button></td>
+      </tr>`).join('');
+  } catch (e) { toast('Could not connect to server. Is the Java server running?', 'error'); }
+}
+
+// ── All Accounts ──────────────────────────────────────────────────
+async function loadAllAccounts() {
+  try {
+    const accounts = await get('/accounts');
+    allAccountsData = accounts;
+    const tbody = document.getElementById('all-accounts');
+    if (!accounts.length) {
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:2rem">
+        <p>No accounts yet</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = accounts.map(a => `
+      <tr>
+        <td class="mono">${a.accountNumber}</td>
+        <td><strong>${a.accountHolderName}</strong></td>
+        <td>${typeBadge(a.accountType)}</td>
+        <td><strong>${fmt(a.balance)}</strong></td>
+        <td style="color:var(--text3)">${a.transactionCount}</td>
+        <td><button class="btn btn-secondary btn-sm" onclick="openDetail('${a.accountNumber}')">Details ›</button></td>
+      </tr>`).join('');
+  } catch (e) { toast('Server error', 'error'); }
+}
+
+// ── Account detail panel ──────────────────────────────────────────
+async function openDetail(accNum) {
+  currentAccountId = accNum;
+  try {
+    const a = await get('/accounts/' + accNum);
+    document.getElementById('d-avatar').textContent   = initials(a.accountHolderName);
+    document.getElementById('d-name').textContent     = a.accountHolderName;
+    document.getElementById('d-accno').textContent    = a.accountNumber;
+    document.getElementById('d-bal').textContent      = fmt(a.balance);
+    document.getElementById('d-type').textContent     = a.accountType;
+    document.getElementById('d-txncount').textContent = a.transactionCount;
+    document.getElementById('account-detail').classList.add('open');
+    document.getElementById('account-detail').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) { toast('Could not load account', 'error'); }
+}
+function closeDetail() {
+  document.getElementById('account-detail').classList.remove('open');
+  currentAccountId = null;
+}
+function prefillDeposit()  { showPage('transact'); if(currentAccountId) document.getElementById('dep-acc').value = currentAccountId; }
+function prefillWithdraw() { showPage('transact'); if(currentAccountId) document.getElementById('wdw-acc').value = currentAccountId; }
+function showHistory()     { showPage('history');  if(currentAccountId) { document.getElementById('h-accnum').value = currentAccountId; loadHistory(); } }
+
+// ── Create Account ────────────────────────────────────────────────
+function switchCreateTab(type, el) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('form-savings').style.display = type === 'savings' ? 'block' : 'none';
+  document.getElementById('form-current').style.display = type === 'current' ? 'block' : 'none';
+}
+
+async function createSavings() {
+  const name    = document.getElementById('s-name').value.trim();
+  const balance = parseFloat(document.getElementById('s-balance').value);
+  if (!name || isNaN(balance)) return toast('Fill in all fields', 'error');
+  const r = await post('/accounts/savings', {name, balance});
+  if (r.success) { toast('Account ' + r.account.accountNumber + ' created!'); document.getElementById('s-name').value=''; document.getElementById('s-balance').value=''; }
+  else toast(r.error, 'error');
+}
+
+async function createCurrent() {
+  const name          = document.getElementById('c-name').value.trim();
+  const balance       = parseFloat(document.getElementById('c-balance').value);
+  const overdraftLimit = parseFloat(document.getElementById('c-overdraft').value);
+  if (!name || isNaN(balance) || isNaN(overdraftLimit)) return toast('Fill in all fields', 'error');
+  const r = await post('/accounts/current', {name, balance, overdraftLimit});
+  if (r.success) { toast('Account ' + r.account.accountNumber + ' created!'); document.getElementById('c-name').value=''; document.getElementById('c-balance').value=''; document.getElementById('c-overdraft').value=''; }
+  else toast(r.error, 'error');
+}
+
+// ── Transactions ──────────────────────────────────────────────────
+async function doDeposit() {
+  const acc = document.getElementById('dep-acc').value.trim();
+  const amt = parseFloat(document.getElementById('dep-amt').value);
+  if (!acc || isNaN(amt)) return toast('Fill in all fields', 'error');
+  const r = await post('/accounts/' + acc + '/deposit', {amount: amt});
+  if (r.success) { toast(r.message + ' · Balance: ' + fmt(r.balance)); document.getElementById('dep-amt').value=''; }
+  else toast(r.error, 'error');
+}
+
+async function doWithdraw() {
+  const acc = document.getElementById('wdw-acc').value.trim();
+  const amt = parseFloat(document.getElementById('wdw-amt').value);
+  if (!acc || isNaN(amt)) return toast('Fill in all fields', 'error');
+  const r = await post('/accounts/' + acc + '/withdraw', {amount: amt});
+  if (r.success) { toast(r.message + ' · Balance: ' + fmt(r.balance)); document.getElementById('wdw-amt').value=''; }
+  else toast(r.error, 'error');
+}
+
+async function doTransfer() {
+  const from = document.getElementById('t-from').value.trim();
+  const to   = document.getElementById('t-to').value.trim();
+  const amt  = parseFloat(document.getElementById('t-amt').value);
+  if (!from || !to || isNaN(amt)) return toast('Fill in all fields', 'error');
+  const r = await post('/transfer', {from, to, amount: amt});
+  if (r.success) { toast(r.message); document.getElementById('t-amt').value=''; }
+  else toast(r.error, 'error');
+}
+
+// ── Transaction History ───────────────────────────────────────────
+async function loadHistory() {
+  const acc = document.getElementById('h-accnum').value.trim();
+  if (!acc) return toast('Enter an account number', 'error');
+  try {
+    const data = await get('/accounts/' + acc + '/history');
+    if (!data.accountNumber) { toast(data.error || 'Account not found', 'error'); return; }
+    const holder = document.getElementById('history-holder');
+    if (!data.transactions || data.transactions.length === 0) {
+      holder.innerHTML = `<div class="empty"><p>No transactions yet</p></div>`; return;
+    }
+    holder.innerHTML = `
+      <div style="margin-bottom:1rem;font-size:13px;color:var(--text2)">
+        <strong>${data.accountHolderName}</strong> · ${data.accountNumber} · ${data.transactions.length} transactions
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Txn ID</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Description</th><th>Date &amp; Time</th></tr></thead>
+        <tbody>
+          ${data.transactions.slice().reverse().map(t => `
+            <tr>
+              <td class="mono" style="font-size:11px">${t.id}</td>
+              <td>${txnBadge(t.type)}</td>
+              <td>${amtCell(t.type, t.amount)}</td>
+              <td class="mono">${fmt(t.balanceAfter)}</td>
+              <td style="color:var(--text2)">${t.description}</td>
+              <td style="color:var(--text3);font-size:12px">${new Date(t.timestamp).toLocaleString('en-IN')}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+  } catch(e) { toast('Server error', 'error'); }
+}
+
+// ── Interest ──────────────────────────────────────────────────────
+async function applyInterestOne() {
+  const acc = document.getElementById('i-accnum').value.trim();
+  if (!acc) return toast('Enter an account number', 'error');
+  const r = await post('/accounts/' + acc + '/interest', {});
+  if (r.success) toast(r.message + ' · New Balance: ' + fmt(r.balance));
+  else toast(r.error, 'error');
+}
+
+async function applyInterestAll() {
+  const r = await post('/interest/all', {});
+  if (r.success) toast(r.message);
+  else toast(r.error, 'error');
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>
