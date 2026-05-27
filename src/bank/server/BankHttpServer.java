@@ -8,7 +8,6 @@ import bank.service.BankService;
 import bank.util.JsonUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class BankHttpServer {
     private static final Logger logger = Logger.getLogger(BankHttpServer.class.getName());
-    private static final int PORT = 8080;
+    private static final int PORT = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
     private final BankService service;
     private HttpServer server;
 
